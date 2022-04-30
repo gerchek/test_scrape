@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"scraper_trendyol/data_collector"
 	"scraper_trendyol/excel_parser"
+	"scraper_trendyol/models"
 	"scraper_trendyol/models/couch_db_model"
 	"scraper_trendyol/pkg/helper"
 	"scraper_trendyol/pkg/logging"
@@ -15,6 +16,7 @@ import (
 	"strconv"
 	"sync/atomic"
 
+	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -199,5 +201,51 @@ func GetExcel(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	// fmt.Println(len(rows))
+
+}
+
+func CategoryDelete(w http.ResponseWriter, r *http.Request) {
+
+	code := mux.Vars(r)["id"]
+
+	fmt.Println(code)
+	resp, err := http.Get("http://admin:123321@localhost:5984/ty_categories/" + code)
+	if err != nil {
+		fmt.Println("error")
+	}
+	defer resp.Body.Close()
+
+	data, _ := ioutil.ReadAll(resp.Body)
+
+	// fmt.Println(data)
+
+	var response models.Category
+	err = json.Unmarshal(data, &response)
+
+	if err != nil {
+		fmt.Println("error")
+	}
+
+	rows := response
+
+	req, err := http.NewRequest(http.MethodDelete, "http://admin:123321@localhost:5984/ty_categories/"+rows.ID+"?rev="+rows.Rev, nil)
+
+	// fmt.Println(req)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("hello")
+
+	}
+	// Create client
+	client := &http.Client{}
+
+	resp_1, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer resp_1.Body.Close()
 
 }

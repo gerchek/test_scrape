@@ -1,6 +1,7 @@
 package models
 
 type Category struct {
+	Rev      string `json:"_rev"`
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Order    string `json:"order"`
