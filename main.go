@@ -57,6 +57,7 @@ func main() {
 	// -----------------------------------------------------------------------------crud
 	r.HandleFunc("/GetExcelData", handler.GetExcel)
 	r.HandleFunc("/category/delete/{id}", handler.CategoryDelete)
+	r.HandleFunc("/category/data/{id}", handler.GetCategoryData)
 
 	logging.Info("[info] start http server listening 9000")
 	err := http.ListenAndServe(":9000", r)

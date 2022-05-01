@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"scraper_trendyol/data_collector"
 	"scraper_trendyol/excel_parser"
@@ -247,5 +249,59 @@ func CategoryDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer resp_1.Body.Close()
+
+}
+
+func GetCategoryData(w http.ResponseWriter, r *http.Request) {
+
+	// 1.
+	payload, err := json.Marshal(map[string]interface{}{
+		"_id":       "1000",
+		"_rev":      "7-b2ec2b739a0c8b9d3fafcc9adef6e77a",
+		"createdAt": "2022-02-26 13:21:36",
+		"id":        "1001",
+		"name":      "Bebek Kremi ve Yağı salamlar",
+		"order":     "1",
+		"parent_id": "2890",
+		"sarga_id":  "NULL",
+		"slug":      "bebek-islak-mendil",
+		"updatedAt": "2022-02-26 13:21:36",
+		"weight":    "0.15",
+	})
+	if err != nil {
+		// log.Fatal(err)
+		fmt.Println("1 error")
+	}
+
+	// 2.
+	client := &http.Client{}
+	url := "http://admin:admin@localhost:5984/ty_categories/1000"
+
+	// 3.
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 4.
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 5.
+	defer resp.Body.Close()
+
+	// 6.
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(string(body))
+
+	// tmpl := template.Must(template.ParseFiles("./views/pages/get_data.html", "./views/partials/vertical_menu.html", "./views/layouts/default.html"))
+	// tmpl.ExecuteTemplate(w, "default", "rows")
 
 }

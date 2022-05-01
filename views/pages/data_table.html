@@ -33,12 +33,12 @@
                 </button>
 
                     <!-- App Search-->
-                    <form class="app-search d-none d-lg-block">
+                    <!-- <form class="app-search d-none d-lg-block">
                         <div class="position-relative">
                             <input type="text" class="form-control" placeholder="Search...">
                             <span class="ri-search-line"></span>
                         </div>
-                    </form>
+                    </form> -->
 
                 </div>
 
@@ -125,6 +125,7 @@
                                             <th>Slug</th>
                                             <th>Weight</th>
                                             <th>Delete</th>
+                                            <th>Update</th>
                                         </tr>
                                     </thead>
 
@@ -142,6 +143,11 @@
                                         <td style="width: 100px">
                                             <a class="btn btn-outline-secondary btn-sm edit" title="Edit" href="/category/delete/{{  .Doc.ID }}">
                                                 <i class="ri-delete-bin-5-line"></i>
+                                            </a>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <a class="btn btn-outline-secondary btn-sm edit" title="Edit" href="/category/data/{{  .Doc.ID }}">
+                                                <i class="ri-message-2-fill"></i>
                                             </a>
                                         </td>
                                     </tr>
