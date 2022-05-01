@@ -176,7 +176,7 @@ type people struct {
 
 func GetExcel(w http.ResponseWriter, r *http.Request) {
 
-	resp, err := http.Get("http://admin:123321@localhost:5984/ty_categories/_all_docs?include_docs=true")
+	resp, err := http.Get("http://admin:admin@localhost:5984/ty_categories/_all_docs?include_docs=true")
 	if err != nil {
 		fmt.Println("error")
 	}
@@ -209,7 +209,7 @@ func CategoryDelete(w http.ResponseWriter, r *http.Request) {
 	code := mux.Vars(r)["id"]
 
 	fmt.Println(code)
-	resp, err := http.Get("http://admin:123321@localhost:5984/ty_categories/" + code)
+	resp, err := http.Get("http://admin:admin@localhost:5984/ty_categories/" + code)
 	if err != nil {
 		fmt.Println("error")
 	}
@@ -228,14 +228,14 @@ func CategoryDelete(w http.ResponseWriter, r *http.Request) {
 
 	rows := response
 
-	req, err := http.NewRequest(http.MethodDelete, "http://admin:123321@localhost:5984/ty_categories/"+rows.ID+"?rev="+rows.Rev, nil)
+	req, err := http.NewRequest(http.MethodDelete, "http://admin:admin@localhost:5984/ty_categories/"+rows.ID+"?rev="+rows.Rev, nil)
 
 	// fmt.Println(req)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("hello")
-
+		http.Redirect(w, r, "/GetExcelData", http.StatusSeeOther)
 	}
 	// Create client
 	client := &http.Client{}
