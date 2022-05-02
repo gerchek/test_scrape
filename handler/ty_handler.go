@@ -254,6 +254,34 @@ func CategoryDelete(w http.ResponseWriter, r *http.Request) {
 
 func GetCategoryData(w http.ResponseWriter, r *http.Request) {
 
+	code := mux.Vars(r)["id"]
+
+	fmt.Println(code)
+	resp, err := http.Get("http://admin:admin@localhost:5984/ty_categories/" + code)
+	if err != nil {
+		fmt.Println("error")
+	}
+	defer resp.Body.Close()
+
+	data, _ := ioutil.ReadAll(resp.Body)
+
+	// fmt.Println(data)
+
+	var response models.Category
+	err = json.Unmarshal(data, &response)
+
+	if err != nil {
+		fmt.Println("error")
+	}
+
+	rows := response
+
+	fmt.Println(rows)
+
+}
+
+func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
+
 	// 1.
 	payload, err := json.Marshal(map[string]interface{}{
 		"_id":       "1000",
