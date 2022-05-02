@@ -356,3 +356,107 @@ func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/GetExcelData", http.StatusSeeOther)
 
 }
+
+func CreateData(w http.ResponseWriter, r *http.Request) {
+
+	tmpl := template.Must(template.ParseFiles("./views/pages/create_data.html", "./views/partials/vertical_menu.html", "./views/layouts/default.html"))
+	tmpl.ExecuteTemplate(w, "default", nil)
+
+}
+
+func SaveData(w http.ResponseWriter, r *http.Request) {
+
+	// ----------------------------------------------------- get latest record id
+
+	resp, err := http.Get("http://admin:admin@localhost:5984/ty_categories/_all_docs?include_docs=true&ascending=true&limit=1")
+	if err != nil {
+		fmt.Println("error")
+	}
+	defer resp.Body.Close()
+
+	data, _ := ioutil.ReadAll(resp.Body)
+	var response couch_db_model.CategoryModelResponse
+	err = json.Unmarshal(data, &response)
+
+	if err != nil {
+		fmt.Println("error")
+	}
+
+	rows := response.Rows
+	id := rows[0].Doc.ID
+	intVar, err := strconv.Atoi(id)
+	// fmt.Println(reflect.TypeOf(intVar))
+
+	// ----------------------------------------------------- create new record
+
+	r.ParseForm()
+	currentTime := time.Now()
+
+	createdAt := fmt.Sprintf("%d-%d-%d %d:%d:%d",
+		currentTime.Year(),
+		currentTime.Month(),
+		currentTime.Day(),
+		currentTime.Hour(),
+		currentTime.Hour(),
+		currentTime.Second())
+
+	sarga_id := r.Form.Get("sarga_id")
+
+	if sarga_id == "" {
+		sarga_id = "NULL"
+	}
+
+	// 1.
+	new_id := intVar + 1
+	_id := strconv.Itoa(new_id)
+
+	payload, err := json.Marshal(map[string]interface{}{
+
+		"createdAt": createdAt,
+		"id":        _id,
+		"name":      r.Form.Get("name"),
+		"order":     r.Form.Get("order"),
+		"parent_id": r.Form.Get("parent_id"),
+		"sarga_id":  sarga_id,
+		"slug":      r.Form.Get("slug"),
+		"updatedAt": createdAt,
+		"weight":    r.Form.Get("weight"),
+	})
+	if err != nil {
+		// log.Fatal(err)
+		fmt.Println("1 error")
+	}
+
+	// 2.
+	client := &http.Client{}
+
+	url := "http://admin:admin@localhost:5984/ty_categories/" + _id
+	// fmt.Println(r.Form.Get("id"))
+
+	// 3.
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 4.
+	new_resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 5.
+	defer new_resp.Body.Close()
+
+	// 6.
+	body, err := ioutil.ReadAll(new_resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(string(body))
+
+	http.Redirect(w, r, "/GetExcelData", http.StatusSeeOther)
+
+}
