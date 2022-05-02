@@ -8,12 +8,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"scraper_trendyol/data_collector"
 	"scraper_trendyol/excel_parser"
 	"scraper_trendyol/models"
 	"scraper_trendyol/models/couch_db_model"
 	"scraper_trendyol/pkg/helper"
 	"scraper_trendyol/pkg/logging"
+	"time"
 
 	"strconv"
 	"sync/atomic"
@@ -256,7 +258,7 @@ func GetCategoryData(w http.ResponseWriter, r *http.Request) {
 
 	code := mux.Vars(r)["id"]
 
-	fmt.Println(code)
+	// fmt.Println(code)
 	resp, err := http.Get("http://admin:admin@localhost:5984/ty_categories/" + code)
 	if err != nil {
 		fmt.Println("error")
@@ -276,25 +278,50 @@ func GetCategoryData(w http.ResponseWriter, r *http.Request) {
 
 	rows := response
 
+	tmpl := template.Must(template.ParseFiles("./views/pages/get_data.html", "./views/partials/vertical_menu.html", "./views/layouts/default.html"))
+	tmpl.ExecuteTemplate(w, "default", rows)
+
 	fmt.Println(rows)
 
 }
 
 func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 
+	// fmt.Println("Hello")
+	r.ParseForm()
+	currentTime := time.Now()
+	// fmt.Printf("%d-%d-%d %d:%d:%d\n",
+	// 	currentTime.Year(),
+	// 	currentTime.Month(),
+	// 	currentTime.Day(),
+	// 	currentTime.Hour(),
+	// 	currentTime.Hour(),
+	// 	currentTime.Second())
+	fmt.Println(reflect.TypeOf(r.Form.Get("CreatedAt")))
+
+	// fmt.Println(r.Form.Get("UpdatedAt"))
+
+	updatedAt := fmt.Sprintf("%d-%d-%d %d:%d:%d",
+		currentTime.Year(),
+		currentTime.Month(),
+		currentTime.Day(),
+		currentTime.Hour(),
+		currentTime.Hour(),
+		currentTime.Second())
+
 	// 1.
 	payload, err := json.Marshal(map[string]interface{}{
-		"_id":       "1000",
-		"_rev":      "7-b2ec2b739a0c8b9d3fafcc9adef6e77a",
-		"createdAt": "2022-02-26 13:21:36",
-		"id":        "1001",
-		"name":      "Bebek Kremi ve Yağı salamlar",
-		"order":     "1",
-		"parent_id": "2890",
-		"sarga_id":  "NULL",
-		"slug":      "bebek-islak-mendil",
-		"updatedAt": "2022-02-26 13:21:36",
-		"weight":    "0.15",
+
+		"_rev":      r.Form.Get("rev"),
+		"createdAt": r.Form.Get("CreatedAt"),
+		"id":        r.Form.Get("id"),
+		"name":      r.Form.Get("name"),
+		"order":     r.Form.Get("order"),
+		"parent_id": r.Form.Get("parent_id"),
+		"sarga_id":  r.Form.Get("sarga_id"),
+		"slug":      r.Form.Get("slug"),
+		"updatedAt": updatedAt,
+		"weight":    r.Form.Get("weight"),
 	})
 	if err != nil {
 		// log.Fatal(err)
@@ -303,7 +330,8 @@ func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 
 	// 2.
 	client := &http.Client{}
-	url := "http://admin:admin@localhost:5984/ty_categories/1000"
+	url := "http://admin:admin@localhost:5984/ty_categories/" + r.Form.Get("id")
+	fmt.Println(r.Form.Get("id"))
 
 	// 3.
 	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
@@ -329,7 +357,6 @@ func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(string(body))
 
-	// tmpl := template.Must(template.ParseFiles("./views/pages/get_data.html", "./views/partials/vertical_menu.html", "./views/layouts/default.html"))
-	// tmpl.ExecuteTemplate(w, "default", "rows")
+	http.Redirect(w, r, "/GetExcelData", http.StatusSeeOther)
 
 }

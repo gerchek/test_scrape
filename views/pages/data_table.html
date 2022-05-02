@@ -124,6 +124,8 @@
                                             <th>SargaID</th>
                                             <th>Slug</th>
                                             <th>Weight</th>
+                                            <th>CreatedAt</th>
+                                            <th>UpdatedAt</th>
                                             <th>Delete</th>
                                             <th>Update</th>
                                         </tr>
@@ -140,6 +142,8 @@
                                         <td>{{  .Doc.SargaID }}</td>
                                         <td>{{  .Doc.Slug }}</td>
                                         <td>{{  .Doc.Weight }}</td>
+                                        <td>{{  .Doc.CreatedAt }}</td>
+                                        <td>{{  .Doc.UpdatedAt }}</td>
                                         <td style="width: 100px">
                                             <a class="btn btn-outline-secondary btn-sm edit" title="Edit" href="/category/delete/{{  .Doc.ID }}">
                                                 <i class="ri-delete-bin-5-line"></i>
