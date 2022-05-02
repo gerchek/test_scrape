@@ -287,19 +287,9 @@ func GetCategoryData(w http.ResponseWriter, r *http.Request) {
 
 func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 
-	// fmt.Println("Hello")
 	r.ParseForm()
 	currentTime := time.Now()
-	// fmt.Printf("%d-%d-%d %d:%d:%d\n",
-	// 	currentTime.Year(),
-	// 	currentTime.Month(),
-	// 	currentTime.Day(),
-	// 	currentTime.Hour(),
-	// 	currentTime.Hour(),
-	// 	currentTime.Second())
 	fmt.Println(reflect.TypeOf(r.Form.Get("CreatedAt")))
-
-	// fmt.Println(r.Form.Get("UpdatedAt"))
 
 	updatedAt := fmt.Sprintf("%d-%d-%d %d:%d:%d",
 		currentTime.Year(),
@@ -308,6 +298,12 @@ func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 		currentTime.Hour(),
 		currentTime.Hour(),
 		currentTime.Second())
+
+	sarga_id := r.Form.Get("sarga_id")
+
+	if sarga_id == "" {
+		sarga_id = "NULL"
+	}
 
 	// 1.
 	payload, err := json.Marshal(map[string]interface{}{
@@ -318,7 +314,7 @@ func UpdateCategoryData(w http.ResponseWriter, r *http.Request) {
 		"name":      r.Form.Get("name"),
 		"order":     r.Form.Get("order"),
 		"parent_id": r.Form.Get("parent_id"),
-		"sarga_id":  r.Form.Get("sarga_id"),
+		"sarga_id":  sarga_id,
 		"slug":      r.Form.Get("slug"),
 		"updatedAt": updatedAt,
 		"weight":    r.Form.Get("weight"),
